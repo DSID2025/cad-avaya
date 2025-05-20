@@ -1,4 +1,4 @@
-package gob.oax.cad.webhook.model;
+package gob.oax.cad.adapter.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

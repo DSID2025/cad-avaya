@@ -1,4 +1,4 @@
-package gob.oax.cad.webhook.adapter;
+package gob.oax.cad.adapter.listener;
 
 import lombok.extern.slf4j.Slf4j;
 

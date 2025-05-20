@@ -1,16 +1,16 @@
-# ☎️ JTAPI Call Adapter – Emergency Call Routing
+# ☎️ Adaptador de Llamadas JTAPI – Enrutamiento de Llamadas de Emergencia
 
-This module listens to Avaya JTAPI events, emits simplified `CallEvent` objects, and exposes an API for routing calls to available agent terminals.
-
----
-
-## 🔧 Overview
-
-This adapter is part of a larger emergency response system. Its sole responsibility is to **listen to Avaya AES call events**, expose them reactively, and allow external systems (like a backend) to decide how to handle those calls.
+Este módulo escucha eventos JTAPI de Avaya, emite objetos simplificados `CallEvent` y expone una API para enrutar llamadas a terminales de agentes disponibles.
 
 ---
 
-## 📶 Sequence Diagram
+## 🔧 Descripción General
+
+Este adaptador es parte de un sistema mayor de respuesta a emergencias. Su única responsabilidad es **escuchar eventos de llamadas de Avaya AES**, exponerlos de forma reactiva y permitir que sistemas externos (como un backend) decidan cómo manejar esas llamadas.
+
+---
+
+## 📶 Diagrama de Secuencia
 
 ```mermaid
 sequenceDiagram
@@ -18,29 +18,29 @@ participant Avaya as Avaya AES (JTAPI)
 participant Adapter as JTAPI Call Adapter
 participant Backend as Backend Service
 participant Agent as Agent Terminal
-    Avaya->>Adapter: Incoming call (ringing)
-    Adapter->>Backend: Emit CallEvent (state: "ringing")
-    Backend->>Backend: Search available agents
+    Avaya->>Adapter: Llamada entrante (ALERTING)
+    Adapter->>Backend: Emite CallStreamEvent (state: "RINGING")
+    Backend->>Backend: Busca terminal disponible
     Backend->>Adapter: POST /api/calls/route\n{ callId, terminal }
     Adapter->>Avaya: call.connect(terminal, address, digits)
-    Avaya-->>Agent: Call rings on assigned terminal
-    Agent-->>Avaya: Answer call
-    Avaya->>Adapter: Event: connected
-    Adapter->>Backend: Emit CallEvent (state: "connected")
+    Avaya-->>Agent: Llamada entrante a la terminal asignada
+    Agent-->>Avaya: Responde llamada
+    Avaya->>Adapter: Event: CONNECTED
+    Adapter->>Backend: Emite CallStreamEvent (state: "CONNECTED")
 
 ```
 
 ---
 
-## 🔁 Event Lifecycle
+## 🔁 Ciclo de Vida de los Eventos
 
-- `ringing`: Detected when the call is alerting at the monitored terminal
-- `connected`: When the agent picks up the call
-- `disconnected`: When the call is ended or lost
+- `ringing`: Detectado cuando la llamada está alertando en el terminal monitoreado
+- `connected`: Cuando el agente contesta la llamada
+- `disconnected`: Cuando la llamada termina o se pierde
 
 ---
 
-## 📤 API – Route Call to Terminal
+## 📤 API – Enrutar Llamada a Terminal
 
 **Endpoint:**  
 `POST /api/calls/route`
@@ -56,12 +56,12 @@ participant Agent as Agent Terminal
 **Response:**
 ```http
 200 OK
-✅ Call successfully routed to terminal: 1003
+✅ Llamada enrutada exitosamente al terminal: 1003
 ```
 
 ---
 
-## ✅ Dependencies
+## ✅ Dependencias
 
 - Spring Boot
 - SLF4J + Lombok
@@ -70,26 +70,27 @@ participant Agent as Agent Terminal
 
 ---
 
-## 📚 Resources
+## 📚 Recursos
 
-- [Avaya JTAPI Programmer’s Guide (10.1+)](https://documentation.avaya.com/bundle/AESOverviewAndSpec_R10.2.x/page/JTAPIProgrammers.html)
-- [Mermaid Live Editor](https://mermaid.live/)
+- [Guía del Programador Avaya JTAPI (10.1+)](https://documentation.avaya.com/bundle/AESOverviewAndSpec_R10.2.x/page/JTAPIProgrammers.html)
+- [Editor en Vivo de Mermaid](https://mermaid.live/)
 
 ---
 
-## 🔐 Security Note
+## 🔐 Nota de Seguridad
 
-Make sure the adapter has permissions to:
-- Control the monitored terminal (origin)
-- Connect to target terminals (agents)
-- Use the proper AES login credentials and TSAPI.PRO config
+Asegúrate de que el adaptador tenga permisos para:
+- Controlar el terminal monitoreado (origen)
+- Conectarse a los terminales de destino (agentes)
+- Usar las credenciales de acceso AES y configuración TSAPI.PRO adecuadas
 
 ---
 
 ## 🧠 Maintainer Note
 
-This adapter **does not decide how to route**. That logic lives in the backend.  
-It only:
-- Listens
-- Emits
-- Executes routing commands when told to
+Este adaptador **no decide cómo enrutar**. Esa lógica vive en el backend.  
+Solo:
+- Escucha
+- Emite
+- Ejecuta comandos de enrutamiento cuando se le indica
+

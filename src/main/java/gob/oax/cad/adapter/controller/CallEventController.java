@@ -1,7 +1,7 @@
-package gob.oax.cad.webhook.controller;
+package gob.oax.cad.adapter.controller;
 
-import gob.oax.cad.webhook.config.CallEventPublisher;
-import gob.oax.cad.webhook.model.CallStreamEvent;
+import gob.oax.cad.adapter.config.CallEventPublisher;
+import gob.oax.cad.adapter.model.CallStreamEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

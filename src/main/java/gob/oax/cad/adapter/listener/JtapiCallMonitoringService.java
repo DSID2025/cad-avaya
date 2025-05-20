@@ -1,7 +1,8 @@
-package gob.oax.cad.webhook.adapter;
+package gob.oax.cad.adapter.listener;
 
-import gob.oax.cad.webhook.config.JtapiProperties;
-import gob.oax.cad.webhook.model.CallStreamEvent;
+import gob.oax.cad.adapter.config.JtapiProperties;
+import gob.oax.cad.adapter.model.CallMetadata;
+import gob.oax.cad.adapter.model.CallStreamEvent;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import javax.telephony.Provider;
 import javax.telephony.Terminal;
 import javax.telephony.events.CallEv;
 import javax.telephony.events.ConnAlertingEv;
+import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -37,7 +39,7 @@ public class JtapiCallMonitoringService {
     private final Consumer<CallStreamEvent> callEventConsumer;
 
     private Provider provider;
-    private final Map<String, Call> activeCalls = new ConcurrentHashMap<>();
+    private final Map<String, CallMetadata> activeCalls = new ConcurrentHashMap<>();
 
     /**
      * Inicializa el listener JTAPI al arrancar el componente.
@@ -69,53 +71,63 @@ public class JtapiCallMonitoringService {
             entryAddress.addCallObserver(new CallObserver() {
                 @Override
                 public void callChangedEvent(CallEv[] events) {
-                    for (CallEv ev : events) {
-                        if (ev instanceof ConnAlertingEv) {
-                            Call call = ev.getCall();
-                            String callId = call.toString();
+                    try {
+                        for (CallEv ev : events) {
+                            if (ev instanceof ConnAlertingEv) {
+                                Call call = ev.getCall();
+                                String callId = call.toString();
 
-                            // Register and listen to this specific call
-                            activeCalls.put(callId, call);
+                                // Register and listen to this specific call
+                                activeCalls.putIfAbsent(callId, new CallMetadata(call, Instant.now()));
 
-                            call.addCallListener(new CallLifecycleListener(callEventConsumer, activeCalls));
+                                call.addCallListener(new CallLifecycleListener(callEventConsumer, activeCalls));
 
-                            log.info("Incoming call [{}] detected on address [{}]", callId, entryAddress.getName());
+                                log.info("Incoming call [{}] detected on address [{}]", callId, entryAddress.getName());
+                            }
                         }
+                    } catch (Exception ex) {
+                        log.error("Error processing call event: {}", ex.getMessage(), ex);
                     }
                 }
             });
 
-            log.info("✅ JTAPI adapter is now listening for calls on address [{}]", entryAddress.getName());
+            log.info("JTAPI adapter is now listening for calls on address [{}]", entryAddress.getName());
 
-        } catch (Exception e) {
-            log.error("Error al inicializar JTAPI (Listener): {}", e.getMessage(), e);
+        } catch (Exception ex) {
+            log.error("Error al inicializar JTAPI (Listener): {}", ex.getMessage(), ex);
         }
     }
 
     // Exposed to backend: route the call to an agent's terminal
     public void routeCall(String callId, String targetExtension) throws Exception {
-        Call call = activeCalls.get(callId);
+        CallMetadata metadata = activeCalls.get(callId);
 
-        if (call == null) {
+        if (metadata == null) {
             log.warn("No active call found with ID: {}", callId);
             throw new IllegalArgumentException("Call not found: " + callId);
         }
 
-        Terminal terminal = provider.getTerminal(properties.getDevice());
-        Address address = provider.getAddress(properties.getDevice());
+        Call call = metadata.getCall();
+
+        String originDevice = properties.getDevice();
+        Terminal originTerminal = provider.getTerminal(originDevice);
+        Address originAddress = provider.getAddress(originDevice);
+
+        if (originTerminal == null || originAddress == null) {
+            throw new IllegalStateException("Origin terminal or address not found for device: " + originDevice);
+        }
 
         try {
-            log.info("Connecting call [{}] to extension [{}]", callId, targetExtension);
+            log.info("Connecting call [{}] from [{}] to [{}]", callId, originDevice, targetExtension);
 
-            call.connect(terminal, address, targetExtension);
+            call.connect(originTerminal, originAddress, targetExtension); // Avaya toma el tercer argumento como el número real de destino
 
             log.info("Call [{}] successfully routed to [{}]", callId, targetExtension);
 
             activeCalls.remove(callId);
-        } catch (Exception e) {
-            log.error("Error routing call {} to {}: {}", callId, targetExtension, e.getMessage(), e);
-            throw e;
+        } catch (Exception ex) {
+            log.error("Error routing call {} to {}: {}", callId, targetExtension, ex.getMessage(), ex);
+            throw ex;
         }
     }
-}
 }

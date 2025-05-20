@@ -1,4 +1,4 @@
-package gob.oax.cad.webhook.config;
+package gob.oax.cad.adapter.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

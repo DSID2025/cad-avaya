@@ -1,9 +1,9 @@
-package gob.oax.cad.webhook.adapter;
+package gob.oax.cad.adapter.listener;
 
-import gob.oax.cad.webhook.model.CallMetadata;
-import gob.oax.cad.webhook.model.CallState;
-import gob.oax.cad.webhook.model.CallStreamEvent;
-import gob.oax.cad.webhook.model.EventSource;
+import gob.oax.cad.adapter.model.CallMetadata;
+import gob.oax.cad.adapter.model.CallState;
+import gob.oax.cad.adapter.model.CallStreamEvent;
+import gob.oax.cad.adapter.model.EventSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,13 +55,13 @@ public class CallLifecycleListener implements CallListener {
 
             if (connections == null || connections.length == 0) return;
 
-            for (Connection conn : connections) {
-                String from = conn.getAddress().getName();
+            for (Connection connection : connections) {
+                String from = connection.getAddress().getName();
                 String to = "";
-                CallState state = mapState(conn.getState());
+                CallState state = mapState(connection.getState());
 
                 try {
-                    TerminalConnection[] terminalConnections = conn.getTerminalConnections();
+                    TerminalConnection[] terminalConnections = connection.getTerminalConnections();
                     if (terminalConnections != null && terminalConnections.length > 0) {
                         to = terminalConnections[0].getTerminal().getName();
                     }
@@ -168,8 +168,8 @@ public class CallLifecycleListener implements CallListener {
 
     }
 
-    private CallState mapState(int jtapiState) {
-        return switch (jtapiState) {
+    private CallState mapState(int state) {
+        return switch (state) {
             case Connection.ALERTING -> CallState.RINGING;
             case Connection.CONNECTED -> CallState.CONNECTED;
             case Connection.DISCONNECTED -> CallState.DISCONNECTED;

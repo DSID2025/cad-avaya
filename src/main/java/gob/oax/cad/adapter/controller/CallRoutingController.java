@@ -1,7 +1,7 @@
-package gob.oax.cad.webhook.controller;
+package gob.oax.cad.adapter.controller;
 
-import gob.oax.cad.webhook.adapter.JtapiCallMonitoringService;
-import gob.oax.cad.webhook.model.RouteCallRequest;
+import gob.oax.cad.adapter.listener.JtapiCallMonitoringService;
+import gob.oax.cad.adapter.model.RouteCallRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

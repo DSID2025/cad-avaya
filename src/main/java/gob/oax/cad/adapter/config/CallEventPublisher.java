@@ -1,6 +1,6 @@
-package gob.oax.cad.webhook.config;
+package gob.oax.cad.adapter.config;
 
-import gob.oax.cad.webhook.model.CallStreamEvent;
+import gob.oax.cad.adapter.model.CallStreamEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Flux;
