@@ -9,6 +9,8 @@ import javax.telephony.CallEvent;
 import javax.telephony.CallListener;
 import javax.telephony.Connection;
 import javax.telephony.MetaEvent;
+import javax.telephony.TerminalConnection;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -26,6 +28,7 @@ public class CallLifecycleListener implements CallListener {
      * Consumidor que recibe los eventos de llamada procesados.
      */
     private final Consumer<CallStreamEvent> callEventConsumer;
+    private final Map<String, Call> callRegistry;
 
     /**
      * Maneja el evento cuando una llamada está activa.
@@ -39,29 +42,26 @@ public class CallLifecycleListener implements CallListener {
     public void callActive(CallEvent event) {
         try {
             Call call = event.getCall();
+            String callId = call.toString();
+
+            callRegistry.putIfAbsent(callId, call);
+
             Connection[] connections = call.getConnections();
 
             if (connections == null || connections.length == 0) return;
 
-            for (Connection connection : connections) {
-                String from = connection.getAddress().getName();
+            for (Connection conn : connections) {
+                String from = conn.getAddress().getName();
                 String to = "";
 
                 try {
-                    to = connection.getTerminalConnections()[0]
-                            .getTerminal().getName();
-                } catch (Exception ignored) {
-                }
+                    TerminalConnection[] terminalConnections = conn.getTerminalConnections();
+                    if (terminalConnections != null && terminalConnections.length > 0) {
+                        to = terminalConnections[0].getTerminal().getName();
+                    }
+                } catch (Exception ignored) {}
 
-                /**
-                 * Se obtiene el estado de la llamada
-                 * ALERTING: Llamada entrante
-                 * CONNECTED: Llamada conectada
-                 * DISCONNECTED: Llamada desconectada
-                 * FAILED: Llamada fallida
-                 */
-
-                String state = switch (connection.getState()) {
+                String state = switch (conn.getState()) {
                     case Connection.ALERTING -> "ringing";
                     case Connection.CONNECTED -> "connected";
                     case Connection.DISCONNECTED -> "disconnected";
@@ -69,11 +69,11 @@ public class CallLifecycleListener implements CallListener {
                     default -> "unknown";
                 };
 
-                CallStreamEvent callEvent = new CallStreamEvent(state, call.toString(), from, to);
-
-                log.info("Evento (Listener) conectado: {}", callEvent);
+                CallStreamEvent callEvent = new CallStreamEvent(state, callId, from, to);
 
                 callEventConsumer.accept(callEvent);
+
+                log.info("Call [{}]: from [{}] to [{}] — State: {}", callId, from, to, state);
             }
         } catch (Exception e) {
             log.error("Error en callActive: {}", e.getMessage(), e);
@@ -94,6 +94,7 @@ public class CallLifecycleListener implements CallListener {
             CallStreamEvent callEvent = new CallStreamEvent("disconnected", callId, "", "");
 
             callEventConsumer.accept(callEvent);
+            callRegistry.remove(callId);
 
             log.info("Llamada terminada o inválida: {}", callEvent);
         } catch (Exception e) {
