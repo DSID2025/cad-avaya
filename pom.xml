@@ -8,8 +8,8 @@
 		<version>3.4.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>gob.oax</groupId>
-	<artifactId>cad-webhook</artifactId>
+	<groupId>gob.oax.cad</groupId>
+	<artifactId>call-adapter</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>cad-webhook</name>

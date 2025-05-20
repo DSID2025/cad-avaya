@@ -1,6 +1,9 @@
 package gob.oax.cad.webhook.adapter;
 
+import gob.oax.cad.webhook.model.CallMetadata;
+import gob.oax.cad.webhook.model.CallState;
 import gob.oax.cad.webhook.model.CallStreamEvent;
+import gob.oax.cad.webhook.model.EventSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -10,6 +13,7 @@ import javax.telephony.CallListener;
 import javax.telephony.Connection;
 import javax.telephony.MetaEvent;
 import javax.telephony.TerminalConnection;
+import java.time.Instant;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -28,7 +32,7 @@ public class CallLifecycleListener implements CallListener {
      * Consumidor que recibe los eventos de llamada procesados.
      */
     private final Consumer<CallStreamEvent> callEventConsumer;
-    private final Map<String, Call> callRegistry;
+    private final Map<String, CallMetadata> callRegistry;
 
     /**
      * Maneja el evento cuando una llamada está activa.
@@ -44,7 +48,8 @@ public class CallLifecycleListener implements CallListener {
             Call call = event.getCall();
             String callId = call.toString();
 
-            callRegistry.putIfAbsent(callId, call);
+            // Check if the call is already registered to avoid duplicates
+            callRegistry.putIfAbsent(callId, new CallMetadata(call, Instant.now()));
 
             Connection[] connections = call.getConnections();
 
@@ -53,6 +58,7 @@ public class CallLifecycleListener implements CallListener {
             for (Connection conn : connections) {
                 String from = conn.getAddress().getName();
                 String to = "";
+                CallState state = mapState(conn.getState());
 
                 try {
                     TerminalConnection[] terminalConnections = conn.getTerminalConnections();
@@ -61,15 +67,18 @@ public class CallLifecycleListener implements CallListener {
                     }
                 } catch (Exception ignored) {}
 
-                String state = switch (conn.getState()) {
-                    case Connection.ALERTING -> "ringing";
-                    case Connection.CONNECTED -> "connected";
-                    case Connection.DISCONNECTED -> "disconnected";
-                    case Connection.FAILED -> "failed";
-                    default -> "unknown";
-                };
+                boolean pending = (state == CallState.RINGING) && to.isBlank();
 
-                CallStreamEvent callEvent = new CallStreamEvent(state, callId, from, to);
+                CallStreamEvent callEvent = new CallStreamEvent(
+                        callId,
+                        from,
+                        to,
+                        state,
+                        pending,
+                        Instant.now(),
+                        EventSource.ADAPTER,
+                        null
+                );
 
                 callEventConsumer.accept(callEvent);
 
@@ -91,7 +100,14 @@ public class CallLifecycleListener implements CallListener {
             Call call = event.getCall();
             String callId = call.toString();
 
-            CallStreamEvent callEvent = new CallStreamEvent("disconnected", callId, "", "");
+            CallStreamEvent callEvent = new CallStreamEvent(
+                    callId,
+                    "", "", CallState.DISCONNECTED,
+                    false,
+                    Instant.now(),
+                    EventSource.ADAPTER,
+                    "Llamada inválida o terminada"
+            );
 
             callEventConsumer.accept(callEvent);
             callRegistry.remove(callId);
@@ -150,5 +166,15 @@ public class CallLifecycleListener implements CallListener {
     @Override
     public void multiCallMetaTransferEnded(MetaEvent metaEvent) {
 
+    }
+
+    private CallState mapState(int jtapiState) {
+        return switch (jtapiState) {
+            case Connection.ALERTING -> CallState.RINGING;
+            case Connection.CONNECTED -> CallState.CONNECTED;
+            case Connection.DISCONNECTED -> CallState.DISCONNECTED;
+            case Connection.FAILED -> CallState.FAILED;
+            default -> CallState.UNKNOWN;
+        };
     }
 }
