@@ -1,0 +1,20 @@
+package gob.oax.cad.webhook.controller;
+
+import gob.oax.cad.webhook.config.CallEventPublisher;
+import gob.oax.cad.webhook.model.CallStreamEvent;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+
+@RestController
+@RequiredArgsConstructor
+public class CallEventController {
+
+    private final CallEventPublisher publisher;
+
+    @GetMapping(value = "/api/llamadas/eventos", produces = "text/event-stream")
+    public Flux<CallStreamEvent> stream() {
+        return publisher.getEvents();
+    }
+}
