@@ -130,4 +130,8 @@ public class JtapiCallMonitoringService {
             throw ex;
         }
     }
+
+    public Map<String, CallMetadata> getActiveCalls() {
+        return activeCalls;
+    }
 }
