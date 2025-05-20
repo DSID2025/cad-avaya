@@ -51,7 +51,7 @@ public class JtapiCallMonitoringService {
      * </p>
      */
     @EventListener(ContextRefreshedEvent.class)
-    public void startJtapiListener() {
+    public boolean startJtapiListener() {
         try {
             log.info("Iniciando JTAPI listener");
 
@@ -95,8 +95,13 @@ public class JtapiCallMonitoringService {
 
             log.info("JTAPI adapter is now listening for calls on address [{}]", entryAddress.getName());
 
+            return true;
         } catch (Exception ex) {
+            provider = null;
+
             log.error("Error al inicializar JTAPI (Listener): {}", ex.getMessage(), ex);
+
+            return false;
         }
     }
 
