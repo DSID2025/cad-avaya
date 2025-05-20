@@ -6,6 +6,8 @@ import gob.oax.cad.adapter.model.CallStreamEvent;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import javax.telephony.Address;
@@ -48,9 +50,11 @@ public class JtapiCallMonitoringService {
      * obtiene el terminal y registra los listeners necesarios para monitorear eventos de llamadas.
      * </p>
      */
-    @PostConstruct
-    public void init() {
+    @EventListener(ContextRefreshedEvent.class)
+    public void startJtapiListener() {
         try {
+            log.info("Iniciando JTAPI listener");
+
             // Create JTAPI provider connection string
             String credentials = String.format("%s;login=%s;passwd=%s",
                     properties.getProvider(),
@@ -131,5 +135,9 @@ public class JtapiCallMonitoringService {
 
     public Map<String, CallMetadata> getActiveCalls() {
         return activeCalls;
+    }
+
+    public Provider getProvider() {
+        return provider;
     }
 }
