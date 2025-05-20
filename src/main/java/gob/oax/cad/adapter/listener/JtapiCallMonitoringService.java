@@ -61,11 +61,9 @@ public class JtapiCallMonitoringService {
             JtapiPeer peer = JtapiPeerFactory.getJtapiPeer(null);
             // Nos conectamos al proveedor JTAPI
             provider = peer.getProvider(credentials);
-
-            // Observe provider state
+            // Agregamos un listener para el proveedor
             provider.addProviderListener(new ProviderListenerAdapter());
 
-            // Observe incoming calls on the main entry point (trunk or IVR line)
             Address entryAddress = provider.getAddress(properties.getDevice());
 
             entryAddress.addCallObserver(new CallObserver() {
@@ -77,7 +75,7 @@ public class JtapiCallMonitoringService {
                                 Call call = ev.getCall();
                                 String callId = call.toString();
 
-                                // Register and listen to this specific call
+                                // Registrar la llamada en el mapa de llamadas activas si no existe
                                 activeCalls.putIfAbsent(callId, new CallMetadata(call, Instant.now()));
 
                                 call.addCallListener(new CallLifecycleListener(callEventConsumer, activeCalls));
@@ -98,7 +96,7 @@ public class JtapiCallMonitoringService {
         }
     }
 
-    // Exposed to backend: route the call to an agent's terminal
+    // Método para enrutar una llamada a un número de extensión específico
     public void routeCall(String callId, String targetExtension) throws Exception {
         CallMetadata metadata = activeCalls.get(callId);
 

@@ -4,6 +4,7 @@ import gob.oax.cad.adapter.model.CallMetadata;
 import gob.oax.cad.adapter.model.CallState;
 import gob.oax.cad.adapter.model.CallStreamEvent;
 import gob.oax.cad.adapter.model.EventSource;
+import gob.oax.cad.adapter.util.CallUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,7 +13,6 @@ import javax.telephony.CallEvent;
 import javax.telephony.CallListener;
 import javax.telephony.Connection;
 import javax.telephony.MetaEvent;
-import javax.telephony.TerminalConnection;
 import java.time.Instant;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -56,16 +56,10 @@ public class CallLifecycleListener implements CallListener {
             if (connections == null || connections.length == 0) return;
 
             for (Connection connection : connections) {
-                String from = connection.getAddress().getName();
-                String to = "";
-                CallState state = mapState(connection.getState());
+                String from = CallUtils.extractFrom(call);
+                String to = CallUtils.extractTo(call);
 
-                try {
-                    TerminalConnection[] terminalConnections = connection.getTerminalConnections();
-                    if (terminalConnections != null && terminalConnections.length > 0) {
-                        to = terminalConnections[0].getTerminal().getName();
-                    }
-                } catch (Exception ignored) {}
+                CallState state = mapState(connection.getState());
 
                 boolean pending = (state == CallState.RINGING) && to.isBlank();
 

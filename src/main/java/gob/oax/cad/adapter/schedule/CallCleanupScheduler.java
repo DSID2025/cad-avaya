@@ -5,14 +5,13 @@ import gob.oax.cad.adapter.model.CallMetadata;
 import gob.oax.cad.adapter.model.CallState;
 import gob.oax.cad.adapter.model.CallStreamEvent;
 import gob.oax.cad.adapter.model.EventSource;
+import gob.oax.cad.adapter.util.CallUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import javax.telephony.Address;
 import javax.telephony.Call;
-import javax.telephony.Connection;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Iterator;
@@ -48,19 +47,7 @@ public class CallCleanupScheduler {
                 log.warn("Orphan call [{}] removed after {} seconds", callId, age.getSeconds());
 
                 Call call = meta.getCall();
-                String from = "";
-
-                try {
-                    Connection[] connections = call.getConnections();
-                    if (connections != null && connections.length > 0) {
-                        Address address = connections[0].getAddress();
-                        if (address != null) {
-                            from = address.getName();
-                        }
-                    }
-                } catch (Exception e) {
-                    log.warn("Could not resolve calling address for call {}: {}", callId, e.getMessage());
-                }
+                String from = CallUtils.extractFrom(call);
 
                 // Optionally emit a synthetic disconnected event
                 CallStreamEvent event = new CallStreamEvent(
