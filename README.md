@@ -26,8 +26,8 @@ sequenceDiagram
     participant Agente as Agente (Navegador WebRTC)
 
     Persona->>Avaya: Llamada entrante al 911
-    Avaya->>Adapter: ConnAlertingEv (RINGING)
-    Adapter->>Backend: Emite CallEvent (RINGING, sin 'to')
+    Avaya->>Adapter: CallEvent (ALERTING)
+    Adapter->>Backend: Emite CallStreamEvent (RINGING, sin 'to')
     Backend->>Backend: Busca agente disponible
     Backend->>Adapter: POST /api/calls/route (callId, agente=WebRTC)
     Adapter->>Avaya: call.connect(911, gatewayExtension)
@@ -35,13 +35,13 @@ sequenceDiagram
     Gateway->>Agente: WebRTC INVITE (via signaling)
     Agente-->>Gateway: Contesta vía navegador
     Gateway-->>Avaya: SIP 200 OK
-    Avaya-->>Adapter: Evento CONNECTED
-    Adapter->>Backend: Emite CallEvent (CONNECTED)
+    Avaya-->>Adapter: CallEvent (CONNECTED)
+    Adapter->>Backend: Emite CallStreamEvent (CONNECTED)
     Note over Persona,Agente: Comunicación en tiempo real (RTP/WebRTC)
     Agente-->>Gateway: Cuelga desde navegador
     Gateway-->>Avaya: SIP BYE
-    Avaya-->>Adapter: Evento DISCONNECTED
-    Adapter->>Backend: Emite CallEvent (DISCONNECTED)
+    Avaya-->>Adapter: CallEvent (DISCONNECTED)
+    Adapter->>Backend: Emite CallStreamEvent (DISCONNECTED)
 
 ```
 
