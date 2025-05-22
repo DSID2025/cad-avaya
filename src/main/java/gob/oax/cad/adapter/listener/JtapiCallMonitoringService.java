@@ -61,12 +61,19 @@ public class JtapiCallMonitoringService {
                     properties.getLogin(),
                     properties.getPassword());
 
+            log.info("Connectando a JTAPI provider: {}", credentials);
+
             // Connect to JTAPI provider
             JtapiPeer peer = JtapiPeerFactory.getJtapiPeer(null);
             // Nos conectamos al proveedor JTAPI
             provider = peer.getProvider(credentials);
+
+            log.info("Conectado a JTAPI provider: {}", provider.getName());
+
             // Agregamos un listener para el proveedor
             provider.addProviderListener(new ProviderListenerAdapter());
+
+            log.info("Listener agregado al proveedor JTAPI: {}", provider.getName());
 
             Address entryAddress = provider.getAddress(properties.getDevice());
 
@@ -79,12 +86,12 @@ public class JtapiCallMonitoringService {
                                 Call call = ev.getCall();
                                 String callId = call.toString();
 
+                                log.info("Incoming call [{}] detected on address [{}]", callId, entryAddress.getName());
+
                                 // Registrar la llamada en el mapa de llamadas activas si no existe
                                 activeCalls.putIfAbsent(callId, new CallMetadata(call, Instant.now()));
 
                                 call.addCallListener(new CallLifecycleListener(callEventConsumer, activeCalls));
-
-                                log.info("Incoming call [{}] detected on address [{}]", callId, entryAddress.getName());
                             }
                         }
                     } catch (Exception ex) {
