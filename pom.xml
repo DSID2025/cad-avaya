@@ -11,8 +11,8 @@
 	<groupId>gob.oax.cad</groupId>
 	<artifactId>call-adapter</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
-	<name>cad-webhook</name>
+	<packaging>jar</packaging>
+	<name>call-adapter</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 
@@ -131,6 +131,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
+					<includeSystemScope>true</includeSystemScope>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
@@ -138,6 +139,13 @@
 						</exclude>
 					</excludes>
 				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
