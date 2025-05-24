@@ -4,7 +4,7 @@
     <springProperty name="appName" source="spring.application.name" />
     <springProperty name="env" source="spring.profiles.active"/>
 
-    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [${appName}, %X{traceId:-}, %X{spanId:-}] %-5level %logger{36} - %msg%n"/>
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [${appName}] %-5level %logger{36} - %msg%n"/>
 
     <property name="LOG_PATH" value="D:/workspace/gob.oaxaca/cad/logs"/>
     <property name="LOG_FILE" value="${LOG_PATH}/${appName}.log"/>
