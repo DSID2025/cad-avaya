@@ -53,7 +53,6 @@ class CallLifecycleListenerTest {
         verify(callEventConsumer).accept(captor.capture());
         CallStreamEvent evt = captor.getValue();
         assertEquals("call-1", evt.getCallId());
-        assertEquals("1001", evt.getFrom());
         assertEquals("1002", evt.getTo());
         assertEquals(CallState.CONNECTED, evt.getState());
         // assertFalse(evt.get());

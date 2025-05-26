@@ -80,6 +80,7 @@ public class SimulatedCallMonitoringService implements CallMonitoringService {
     private void emitSimulatedEvent(String callId, String agentId, CallState state, String notes) {
         CallStreamEvent event = new CallStreamEvent();
         event.setCallId(callId);
+        event.setFrom("5551234567");
         event.setAgentId(agentId);
         event.setState(state);
         event.setTimestamp(Instant.now());

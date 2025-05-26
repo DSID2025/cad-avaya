@@ -33,7 +33,7 @@ public class TestCallSimulatorController {
         CallStreamEvent event = new CallStreamEvent(
                 callId,
                 null,
-                "+529511122334",
+                "5551234567",
                 state == CallState.RINGING ? null : "8801",
                 state,
                 false,
