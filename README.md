@@ -193,6 +193,50 @@ El directorio `deployment/wiremock/` dentro del monorepo contiene:
 - `mappings/`: archivos `.json` que definen los endpoints simulados y sus respuestas.
 - `__files/`: archivos opcionales con cuerpos de respuesta externos (ej. JSON, imágenes, etc).
 
+## 🧪 Simulaciones Automatizadas con Newman
+
+Para automatizar las pruebas o simulaciones hacia el adapter JTAPI, puedes utilizar [Newman](https://www.npmjs.com/package/newman), la herramienta oficial de Postman para ejecutar colecciones desde la línea de comandos.
+
+### 🔧 Requisitos
+
+Asegúrate de tener Node.js instalado y luego ejecuta:
+
+```bash
+npm install -g newman
+```
+
+### 📁 Estructura recomendada
+
+Crea una carpeta en el monorepo:
+
+```
+postman/
+├── jtapi-simulations.postman_collection.json
+└── env.local.postman_environment.json (opcional)
+```
+
+### 🌐 Archivo de entorno (`env.local.postman_environment.json`)
+
+Define tus variables reutilizables:
+
+```json
+{
+  "name": "Local",
+  "values": [
+    { "key": "host", "value": "localhost", "enabled": true },
+    { "key": "port", "value": "8081", "enabled": true }
+  ]
+}
+```
+
+### 🔁 Ejecutar la solicitud
+
+Para ejecutar la colección de simulaciones con Newman, usa el siguiente comando:
+
+```bash
+newman run postman/jtapi-simulations.postman_collection.json --environment postman/env.local.postman_environment.json --folder "Simular RINGING"
+```
+
 
 ---
 

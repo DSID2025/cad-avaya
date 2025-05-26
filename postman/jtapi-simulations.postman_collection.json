@@ -1,0 +1,34 @@
+{
+  "info": {
+    "_postman_id": "7103e784-5fae-42b6-bbf6-eaf0805ffe99",
+    "name": "jtapi-simulations",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Simular RINGING",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://{{host}}:{{port}}/gob-oax-cad-call-adapter-avaya/api/calls/ringing/{{$randomUUID}}",
+          "protocol": "http",
+          "host": ["{{host}}"],
+          "port": "{{port}}",
+          "path": [
+            "gob-oax-cad-call-adapter-avaya",
+            "api",
+            "calls",
+            "ringing",
+            "{{$randomUUID}}"
+          ]
+        }
+      }
+    }
+  ]
+}
