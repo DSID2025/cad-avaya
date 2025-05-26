@@ -165,7 +165,7 @@ cd backend/gob-oax-cad-call-backend
 mvn clean spring-boot:run
 ```
 
-## 🌐 2. Frontend (Angular)
+### 🌐 2. Frontend (Angular)
 
 Ejecuta el panel del agente con Angular CLI:
 
