@@ -57,7 +57,17 @@ cad/
   - Comunicación vía WebRTC con gateway SIP.
 
 ---
+## 📦 Requisitos Previos
 
+Para ejecutar los distintos componentes del sistema en modo local, asegúrate de tener instalado lo siguiente:
+
+- **Java 17+**
+- **Maven 3.9+**
+- **Node.js 18+** y **Angular CLI** (`npm install -g @angular/cli`)
+- **WireMock standalone** (para simular el servicio de RapidSOS)
+- **Postman / Newman** (para pruebas automatizadas opcionales)
+
+---
 ## 🛠️ Tecnologías utilizadas
 
 - **Java 17 + Spring Boot** – Para todos los servicios backend.
