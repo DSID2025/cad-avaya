@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPath": "/oauth/token"
+  },
+  "response": {
+    "status": 200,
+    "body": "{\"access_token\":\"mock-token\",\"expires_in\":3600,\"token_type\":\"Bearer\"}",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

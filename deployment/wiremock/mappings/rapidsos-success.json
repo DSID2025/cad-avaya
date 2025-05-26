@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/emergency-data",
+    "queryParameters": {
+      "number": {
+        "equalTo": "5551234567"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "rapidsos-response.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
