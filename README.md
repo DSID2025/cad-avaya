@@ -192,8 +192,8 @@ Esto abrirá la aplicación en http://localhost:4200.
 Puedes usar WireMock como mock server para simular respuestas de la API de RapidSOS. Requiere Java 17+:
 
 ```bash
-cd /ruta/externa/a/wiremock/
-java -jar wiremock-standalone.jar   --port 8090   --root-dir /ruta/al/monorepo/cad-avaya/deployment/wiremock/
+cd D:/workspace/tools/ (o donde tengas WireMock)
+java -jar wiremock-standalone.jar   --port 8089   --root-dir D:/workspace/goboax/cad-avaya/deployment/wiremock/ (o donde tengas el directorio de mappings)
 ```
 
 #### Directorio de Mappings
