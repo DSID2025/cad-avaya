@@ -8,10 +8,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @EnableFeignClients(basePackages = "gob.oax.cad")
-public class CadCallAdapterApplication {
+public class RapidsosAdapterApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CadCallAdapterApplication.class, args);
+		SpringApplication.run(RapidsosAdapterApplication.class, args);
 	}
 
 }
