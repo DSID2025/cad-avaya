@@ -17,6 +17,10 @@ cad/
 │
 ├── frontend/
 │   └── gob-oax-cad-call-frontend-agent/          # Aplicación Angular para agentes que reciben y gestionan llamadas WebRTC
+├── deployment/
+│   └── wiremock/              # Mappings simulados para el API de RapidSOS
+│       ├── mappings/          # Respuestas mock definidas por escenario
+│       └── __files/           # Cuerpos de respuesta externos (opcional)
 │
 └── README.md
 ```
@@ -138,3 +142,65 @@ sequenceDiagram
     Adapter->>Backend: Emite CallStreamEvent (DISCONNECTED)
 
 ```
+
+---
+
+## 🧪 Ejecución de los Componentes
+
+### 🔧 1. Backend y Adapters (Spring Boot)
+
+Cada servicio Spring Boot puede ejecutarse con Maven:
+
+```bash
+# JTAPI Adapter
+cd adapters/gob-oax-cad-call-adapter-avaya
+mvn clean spring-boot:run
+
+# RapidSOS Adapter
+cd adapters/gob-oax-cad-location-adapter-rapidsos
+mvn clean spring-boot:run
+
+# Router Backend
+cd backend/gob-oax-cad-call-backend
+mvn clean spring-boot:run
+```
+
+## 🌐 2. Frontend (Angular)
+
+Ejecuta el panel del agente con Angular CLI:
+
+```bash
+cd frontend/gob-oax-cad-call-frontend-agent
+npm install
+ng serve
+```
+
+Esto abrirá la aplicación en http://localhost:4200.
+
+### 🧪 3. Simulación de RapidSOS con WireMock
+
+Puedes usar WireMock como mock server para simular respuestas de la API de RapidSOS. Requiere Java 17+:
+
+```bash
+cd /ruta/externa/a/wiremock/
+java -jar wiremock-standalone.jar   --port 8090   --root-dir /ruta/al/monorepo/cad-avaya/deployment/wiremock/
+```
+
+#### Directorio de Mappings
+
+El directorio `deployment/wiremock/` dentro del monorepo contiene:
+
+- `mappings/`: archivos `.json` que definen los endpoints simulados y sus respuestas.
+- `__files/`: archivos opcionales con cuerpos de respuesta externos (ej. JSON, imágenes, etc).
+
+
+---
+
+## ⚠️ Notas
+- Todos los servicios corren por defecto en los siguientes puertos:
+  - JTAPI Adapter: 8081
+  - RapidSOS Adapter: 8082
+  - Router Backend: 8080
+  - Angular (dev): 4200
+
+- Los componentes se comunican entre sí mediante HTTP y WebSocket.
