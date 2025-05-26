@@ -1,6 +1,6 @@
 package gob.oax.cad.adapter.schedule;
 
-import gob.oax.cad.adapter.listener.JtapiCallMonitoringService;
+import gob.oax.cad.adapter.listener.CallMonitoringService;
 import gob.oax.cad.adapter.model.CallMetadata;
 import gob.oax.cad.adapter.model.CallState;
 import gob.oax.cad.adapter.model.CallStreamEvent;
@@ -23,7 +23,7 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public class CallCleanupScheduler {
 
-    private final JtapiCallMonitoringService callService;
+    private final CallMonitoringService callMonitoringService;
     private final Consumer<CallStreamEvent> callEventConsumer;
 
     // Run every 60 seconds
@@ -32,7 +32,7 @@ public class CallCleanupScheduler {
         Instant now = Instant.now();
         int cleaned = 0;
 
-        Iterator<Map.Entry<String, CallMetadata>> iterator = callService.getActiveCalls().entrySet().iterator();
+        Iterator<Map.Entry<String, CallMetadata>> iterator = callMonitoringService.getActiveCalls().entrySet().iterator();
 
         while (iterator.hasNext()) {
             Map.Entry<String, CallMetadata> entry = iterator.next();
@@ -52,6 +52,7 @@ public class CallCleanupScheduler {
                 // Optionally emit a synthetic disconnected event
                 CallStreamEvent event = new CallStreamEvent(
                         callId,
+                        null,
                         from,
                         "",
                         CallState.DISCONNECTED,

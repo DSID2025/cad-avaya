@@ -1,6 +1,6 @@
 package gob.oax.cad.adapter.health;
 
-import gob.oax.cad.adapter.listener.JtapiCallMonitoringService;
+import gob.oax.cad.adapter.listener.CallMonitoringService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.health.Health;
@@ -15,7 +15,7 @@ import java.time.Instant;
 @RequiredArgsConstructor
 public class ProviderHealthIndicator implements HealthIndicator {
 
-    private final JtapiCallMonitoringService jtapiService;
+    private final CallMonitoringService callMonitoringService;
 
     @Override
     public Health health() {
@@ -23,7 +23,7 @@ public class ProviderHealthIndicator implements HealthIndicator {
             log.info("Checking JTAPI provider health");
 
             Instant now = Instant.now();
-            Provider provider = jtapiService.getProvider();
+            Provider provider = callMonitoringService.getProvider();
 
             if (provider == null) {
                 log.warn("JTAPI Provider not initialized yet");

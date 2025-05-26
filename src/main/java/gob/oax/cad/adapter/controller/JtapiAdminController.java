@@ -1,6 +1,6 @@
 package gob.oax.cad.adapter.controller;
 
-import gob.oax.cad.adapter.listener.JtapiCallMonitoringService;
+import gob.oax.cad.adapter.listener.CallMonitoringService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +19,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class JtapiAdminController {
 
-    private final JtapiCallMonitoringService jtapiService;
+    private final CallMonitoringService callMonitoringService;
 
     @PostMapping("/reconnect")
     public ResponseEntity<?> reconnectProvider() {
-        boolean success = jtapiService.startJtapiListener();
+        boolean success = callMonitoringService.initialize();
 
         if (success) {
             return ResponseEntity.ok("JTAPI provider reconnected");
@@ -34,7 +34,7 @@ public class JtapiAdminController {
 
     @GetMapping("/status")
     public ResponseEntity<Map<String, Object>> getProviderStatus() {
-        Provider provider = jtapiService.getProvider();
+        Provider provider = callMonitoringService.getProvider();
         String state;
         String code;
 

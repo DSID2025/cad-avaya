@@ -65,6 +65,7 @@ public class CallLifecycleListener implements CallListener {
 
                 CallStreamEvent callEvent = new CallStreamEvent(
                         callId,
+                        null,
                         from,
                         to,
                         state,
@@ -96,6 +97,7 @@ public class CallLifecycleListener implements CallListener {
 
             CallStreamEvent callEvent = new CallStreamEvent(
                     callId,
+                    null,
                     "", "", CallState.DISCONNECTED,
                     false,
                     Instant.now(),

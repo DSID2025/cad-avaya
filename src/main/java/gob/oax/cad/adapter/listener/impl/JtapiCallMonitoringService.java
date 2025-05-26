@@ -1,14 +1,17 @@
-package gob.oax.cad.adapter.listener;
+package gob.oax.cad.adapter.listener.impl;
 
 import com.avaya.jtapi.tsapi.LucentCall;
 import com.avaya.jtapi.tsapi.LucentTerminalConnection;
 import com.avaya.jtapi.tsapi.LucentV5Call;
 import gob.oax.cad.adapter.config.JtapiProperties;
+import gob.oax.cad.adapter.listener.CallLifecycleListener;
+import gob.oax.cad.adapter.listener.CallMonitoringService;
+import gob.oax.cad.adapter.listener.ProviderListenerAdapter;
 import gob.oax.cad.adapter.model.CallMetadata;
 import gob.oax.cad.adapter.model.CallStreamEvent;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -37,10 +40,11 @@ import java.util.function.Consumer;
  * y registra un listener para eventos de llamadas, enviando los eventos a un consumidor proporcionado.
  * </p>
  */
-@Component
-@RequiredArgsConstructor
 @Slf4j
-public class JtapiCallMonitoringService {
+@Component
+@Profile("prod")
+@RequiredArgsConstructor
+public class JtapiCallMonitoringService implements CallMonitoringService {
 
     private final JtapiProperties properties;
     private final Consumer<CallStreamEvent> callEventConsumer;
@@ -56,7 +60,7 @@ public class JtapiCallMonitoringService {
      * </p>
      */
     @EventListener(ContextRefreshedEvent.class)
-    public boolean startJtapiListener() {
+    public boolean initialize() {
         try {
             log.info("Iniciando JTAPI listener");
 
@@ -117,7 +121,7 @@ public class JtapiCallMonitoringService {
         }
     }
 
-    // Método para enrutar una llamada a un número de extensión específico
+    @Override
     public void routeCall(String callId, String targetExtension) throws Exception {
         CallMetadata metadata = activeCalls.get(callId);
 
@@ -150,6 +154,7 @@ public class JtapiCallMonitoringService {
         }
     }
 
+    @Override
     public void transferCall(String callId, String toExtension) throws Exception {
         CallMetadata metadata = activeCalls.get(callId);
         if (metadata == null) throw new IllegalArgumentException("Call not found");
@@ -165,6 +170,7 @@ public class JtapiCallMonitoringService {
         }
     }
 
+    @Override
     public void holdCall(String callId) throws Exception {
         CallMetadata metadata = activeCalls.get(callId);
         if (metadata == null) throw new IllegalArgumentException("Call not found");
@@ -188,6 +194,7 @@ public class JtapiCallMonitoringService {
         }
     }
 
+    @Override
     public void unholdCall(String callId) throws Exception {
         CallMetadata metadata = activeCalls.get(callId);
         if (metadata == null) throw new IllegalArgumentException("Call not found");
@@ -211,6 +218,7 @@ public class JtapiCallMonitoringService {
         }
     }
 
+    @Override
     public void terminateCall(String callId) throws Exception {
         CallMetadata metadata = activeCalls.get(callId);
         if (metadata == null) throw new IllegalArgumentException("Call not found");
@@ -232,6 +240,7 @@ public class JtapiCallMonitoringService {
         }
     }
 
+    @Override
     public void addToConference(String callId, String newParticipantExt) throws Exception {
         CallMetadata metadata = activeCalls.get(callId);
         if (metadata == null) throw new IllegalArgumentException("Call not found");
@@ -247,10 +256,12 @@ public class JtapiCallMonitoringService {
         }
     }
 
+    @Override
     public Map<String, CallMetadata> getActiveCalls() {
         return activeCalls;
     }
 
+    @Override
     public Provider getProvider() {
         return provider;
     }

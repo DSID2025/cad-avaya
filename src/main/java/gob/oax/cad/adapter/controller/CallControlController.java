@@ -1,6 +1,6 @@
 package gob.oax.cad.adapter.controller;
 
-import gob.oax.cad.adapter.listener.JtapiCallMonitoringService;
+import gob.oax.cad.adapter.listener.CallMonitoringService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,32 +16,32 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CallControlController {
 
-    private final JtapiCallMonitoringService jtapiCallMonitoringService;
+    private final CallMonitoringService callMonitoringService;
 
     @PostMapping("/{callId}/transfer")
     public ResponseEntity<?> transferCall(@PathVariable String callId, @RequestParam String toExtension) {
         try {
-            jtapiCallMonitoringService.transferCall(callId, toExtension);
+            callMonitoringService.transferCall(callId, toExtension);
             return ResponseEntity.ok("Call transferred to " + toExtension);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Transfer failed: " + e.getMessage());
         }
     }
 
-    @PostMapping("/{callId}/pause")
-    public ResponseEntity<?> pauseCall(@PathVariable String callId) {
+    @PostMapping("/{callId}/hold")
+    public ResponseEntity<?> holdCall(@PathVariable String callId) {
         try {
-            jtapiCallMonitoringService.holdCall(callId);
+            callMonitoringService.holdCall(callId);
             return ResponseEntity.ok("Call placed on hold");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Hold failed: " + e.getMessage());
         }
     }
 
-    @PostMapping("/{callId}/resume")
-    public ResponseEntity<?> resumeCall(@PathVariable String callId) {
+    @PostMapping("/{callId}/unhold")
+    public ResponseEntity<?> unholdCall(@PathVariable String callId) {
         try {
-            jtapiCallMonitoringService.unholdCall(callId);
+            callMonitoringService.unholdCall(callId);
             return ResponseEntity.ok("Call resumed");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Resume failed: " + e.getMessage());
@@ -51,7 +51,7 @@ public class CallControlController {
     @PostMapping("/{callId}/end")
     public ResponseEntity<?> endCall(@PathVariable String callId) {
         try {
-            jtapiCallMonitoringService.terminateCall(callId);
+            callMonitoringService.terminateCall(callId);
             return ResponseEntity.ok("Call disconnected");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("End call failed: " + e.getMessage());

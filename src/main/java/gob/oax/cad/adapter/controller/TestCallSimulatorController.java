@@ -29,23 +29,10 @@ public class TestCallSimulatorController {
         return emit(callId, CallState.RINGING, "Llamada entrante simulada");
     }
 
-    @PostMapping("/connected/{callId}")
-    public ResponseEntity<Void> simulateConnected(@PathVariable String callId) {
-        log.info("Simulando llamada conectada con callId={}", callId);
-
-        return emit(callId, CallState.CONNECTED, "Llamada conectada simulada");
-    }
-
-    @PostMapping("/disconnected/{callId}")
-    public ResponseEntity<Void> simulateDisconnected(@PathVariable String callId) {
-        log.info("Simulando llamada finalizada con callId={}", callId);
-
-        return emit(callId, CallState.DISCONNECTED, "Llamada finalizada simulada");
-    }
-
     private ResponseEntity<Void> emit(String callId, CallState state, String note) {
         CallStreamEvent event = new CallStreamEvent(
                 callId,
+                null,
                 "+529511122334",
                 state == CallState.RINGING ? null : "8801",
                 state,

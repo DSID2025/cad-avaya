@@ -1,6 +1,6 @@
 package gob.oax.cad.adapter.controller;
 
-import gob.oax.cad.adapter.listener.JtapiCallMonitoringService;
+import gob.oax.cad.adapter.listener.CallMonitoringService;
 import gob.oax.cad.adapter.model.RouteCallRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CallRoutingController {
 
-    private final JtapiCallMonitoringService jtapiCallMonitoringService;
+    private final CallMonitoringService callMonitoringService;
 
     @PostMapping("/route")
     public ResponseEntity<?> routeCall(@RequestBody RouteCallRequest request) {
         try {
-            jtapiCallMonitoringService.routeCall(request.getCallId(), request.getTerminal());
+            callMonitoringService.routeCall(request.getCallId(), request.getTerminal());
 
             return ResponseEntity.ok("✅ Call successfully routed to terminal: " + request.getTerminal());
         } catch (Exception e) {
