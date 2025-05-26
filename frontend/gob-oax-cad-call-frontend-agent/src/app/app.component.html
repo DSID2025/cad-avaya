@@ -1,0 +1,41 @@
+<div class="container">
+  <h2>📞 Panel del Agente</h2>
+
+  <!-- Conexión -->
+  <div class="connection">
+    <input type="text" [(ngModel)]="extension" placeholder="Extensión del agente" [disabled]="isConnected" />
+    <button (click)="connect()" [disabled]="isConnected">🔌 Conectar</button>
+    <button (click)="disconnect()" [disabled]="!isConnected">❎ Desconectar</button>
+  </div>
+
+  <!-- Estado de conexión y llamada -->
+  <div *ngIf="isConnected">
+    <p>🟢 Conectado como <strong>{{ extension }}</strong></p>
+    <p *ngIf="currentCallId">
+      {{ inCall ? '📞 En llamada activa' : '🔔 Llamada entrante' }} (callId: <strong>{{ currentCallId }}</strong>)
+    </p>
+
+    <!-- 📍 Botón para buscar ubicación -->
+    <button
+      *ngIf="callerNumber && currentCallId"
+      (click)="lookupLocation()">
+      📍 Buscar ubicación
+    </button>
+  </div>
+
+  <!-- Controles de llamada -->
+  <div class="controls">
+    <button (click)="answerCall()" [disabled]="!isConnected || !currentCallId || inCall">✅ Tomar llamada</button>
+    <button (click)="hangUp()" [disabled]="!inCall">❌ Colgar</button>
+    <button (click)="transferCall()" [disabled]="!inCall">🔁 Transferir</button>
+    <button (click)="toggleHold()" [disabled]="!inCall">
+      {{ isOnHold ? '▶️ Reanudar' : '⏸️ Hold' }}
+    </button>
+  </div>
+
+  <!-- Log de eventos -->
+  <h3>🧾 Log de eventos</h3>
+  <div class="log-box">
+    <div *ngFor="let line of messages" class="log-line">{{ line }}</div>
+  </div>
+</div>
